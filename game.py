@@ -89,8 +89,7 @@ class SnakeGame:
         self.score = len(self.snake) - 3
 
         game_over = False
-        reward = 0
-        # reward = self.score
+        reward = -1
 
         if self.head in self.green_apples:
             reward += 1
