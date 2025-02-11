@@ -3,19 +3,19 @@ import random
 import torch
 from model import DQN
 from trainer import Trainer
-from settings import device
+from settings import config
 
 
 class Agent:
-    def __init__(self, gamma, epsilon, max_memory, batch_size, lr):
+    def __init__(self, gamma, epsilon_init, max_memory, batch_size, lr):
         self.gamma = gamma  # Discount factor, how much we value future rewards
-        self.epsilon = epsilon  # Exploration vs exploitation trade-off
+        self.epsilon = epsilon_init  # Exploration vs exploitation trade-off
         self.memory = deque(maxlen=max_memory)
         self.batch_size = batch_size
         self.model = DQN(
             n_observations=9,
             n_actions=3,
-        ).to(device)
+        ).to(config['device'])
         self.trainer = Trainer(self.model, lr, gamma)
 
     def remember(self, state, action, reward, next_state, done):
@@ -44,10 +44,11 @@ class Agent:
         else:
             state = torch.tensor(
                 state,
-                dtype=torch.float32
-            ).to(device)
+                dtype=torch.float32,
+                device=config['device'],
+            )
             prediction = self.model(state)
-            choice = torch.argmax(prediction).item()
+            choice = prediction.argmax().item()
             action[choice] = 1
             print(f"Predicted action: {action}")
 

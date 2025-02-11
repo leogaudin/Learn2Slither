@@ -2,5 +2,6 @@ matplotlib
 numpy
 torch
 pygame
+pyyaml
 # safetensors
 # pip install --pre torch --index-url https://download.pytorch.org/whl/nightly/cpu

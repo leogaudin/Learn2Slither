@@ -24,12 +24,16 @@ class Direction(Enum):
 
 BLOCK_SIZE = 20
 
-GREEN_APPLES = 2
-RED_APPLES = 1
-
 
 class SnakeGame:
-    def __init__(self, width=760, height=520):
+    def __init__(
+        self,
+        width=760,
+        height=520,
+        fps=0,
+        green_apples_count=2,
+        red_apples_count=1,
+    ):
         if width % (BLOCK_SIZE * 2) != 0 or height % (BLOCK_SIZE * 2) != 0:
             raise Exception(
                 "Width and Height must be multiples of " + str(BLOCK_SIZE * 2)
@@ -37,12 +41,16 @@ class SnakeGame:
 
         self.width = width
         self.height = height
+        self.fps = fps
+        self.green_apples_count = green_apples_count
+        self.red_apples_count = red_apples_count
         self.display = pygame.display.set_mode((self.width, self.height))
         pygame.display.set_caption("Learn2Slither")
         self.clock = pygame.time.Clock()
         self.reset()
 
     def reset(self):
+        self.time_alive = 0
         self.direction = random.choice(list(Direction))
         self.head = Point(
             random.randint(0, (self.width - BLOCK_SIZE)
@@ -61,7 +69,7 @@ class SnakeGame:
         self._place_food()
 
     def _place_food(self):
-        while len(self.green_apples) < GREEN_APPLES:
+        while len(self.green_apples) < self.green_apples_count:
             x = random.randint(0, (self.width - BLOCK_SIZE)
                                // BLOCK_SIZE) * BLOCK_SIZE
             y = random.randint(0, (self.height - BLOCK_SIZE)
@@ -76,7 +84,7 @@ class SnakeGame:
 
             self.green_apples.append(Point(x, y))
 
-        while len(self.red_apples) < RED_APPLES:
+        while len(self.red_apples) < self.red_apples_count:
             x = random.randint(0, (self.width - BLOCK_SIZE)
                                // BLOCK_SIZE) * BLOCK_SIZE
             y = random.randint(0, (self.height - BLOCK_SIZE)
@@ -94,9 +102,9 @@ class SnakeGame:
     def play_step(
         self,
         direction=None,
-        fps: int = 0,
         to_display: list[str] = []
     ):
+        self.time_alive += 1
         self.direction = self._move(
             direction if direction is not None else self.direction
         )
@@ -121,9 +129,12 @@ class SnakeGame:
             self.snake.pop()
 
         self._update_ui(to_display)
-        self.clock.tick(fps)
+        self.clock.tick(self.fps)
 
-        if len(self.snake) <= 0 or self.is_collision(self.head):
+        if len(self.snake) <= 0 \
+                or self.is_collision(self.head) \
+                or self.time_alive \
+                > self.width * self.height / (BLOCK_SIZE ** 2):
             reward = -100
             game_over = True
 
@@ -264,6 +275,10 @@ class SnakeGame:
         right = clock[(current + 1) % 4]
 
         state = [
+            # {
+            #     "label": "time_alive",
+            #     "value": self.time_alive,
+            # },
             {
                 "label": "danger_straight",
                 "value": (dir_r and self.is_collision(point_r))
@@ -300,100 +315,3 @@ class SnakeGame:
         ]
 
         return state
-
-    # def get_state(self):
-    #     head = self.snake[0]
-
-    #     left_wall = Point(0, head.y)
-    #     right_wall = Point(self.width - BLOCK_SIZE, head.y)
-    #     top_wall = Point(head.x, 0)
-    #     bottom_wall = Point(head.x, self.height - BLOCK_SIZE)
-
-    #     green_apple_up = \
-    #         Direction.UP == self._direction(head, self.green_apples[0])\
-    #         or Direction.UP == self._direction(head, self.green_apples[1])
-
-    #     green_apple_down = \
-    #         Direction.DOWN == self._direction(head, self.green_apples[0])\
-    #         or Direction.DOWN == self._direction(head, self.green_apples[1])
-
-    #     green_apple_left = \
-    #         Direction.LEFT == self._direction(head, self.green_apples[0])\
-    #         or Direction.LEFT == self._direction(head, self.green_apples[1])
-
-    #     green_apple_right = \
-    #         Direction.RIGHT == self._direction(head, self.green_apples[0])\
-    #         or Direction.RIGHT == self._direction(head, self.green_apples[1])
-
-    #     red_apple_up = \
-    #         Direction.UP == self._direction(head, self.red_apples[0])
-    #     red_apple_down = \
-    #         Direction.DOWN == self._direction(head, self.red_apples[0])
-    #     red_apple_left = \
-    #         Direction.LEFT == self._direction(head, self.red_apples[0])
-    #     red_apple_right = \
-    #         Direction.RIGHT == self._direction(head, self.red_apples[0])
-
-    # state = [
-    #     {"label": "move_up", "value": self.direction == Direction.UP},
-    #     {"label": "move_down", "value": self.direction == Direction.DOWN},
-    #     {"label": "move_left", "value": self.direction == Direction.LEFT},
-    #     {"label": "move_right", "value": self.direction == Direction.RIGHT},
-
-    #     {"label": "distance_top_wall",
-    #      "value": self._distance(head, top_wall)},
-    #     {"label": "distance_bottom_wall",
-    #      "value": self._distance(head, bottom_wall)},
-    #     {"label": "distance_left_wall",
-    #      "value": self._distance(head, left_wall)},
-    #     {"label": "distance_right_wall",
-    #      "value": self._distance(head, right_wall)},
-
-    #     {"label": "distance_green_apple_1",
-    #      "value": self._distance(head, self.green_apples[0])},
-    #     {"label": "distance_green_apple_2",
-    #      "value": self._distance(head, self.green_apples[1])},
-    #     {"label": "distance_red_apple",
-    #      "value": self._distance(head, self.red_apples[0])},
-
-    #     {"label": "green_apple_up", "value": green_apple_up},
-    #     {"label": "green_apple_down", "value": green_apple_down},
-    #     {"label": "green_apple_left", "value": green_apple_left},
-    #     {"label": "green_apple_right", "value": green_apple_right},
-
-    #     {"label": "red_apple_up", "value": red_apple_up},
-    #     {"label": "red_apple_down", "value": red_apple_down},
-    #     {"label": "red_apple_left", "value": red_apple_left},
-    #     {"label": "red_apple_right", "value": red_apple_right},
-    # ]
-
-    #     return state
-
-
-# if __name__ == '__main__':
-#     game = SnakeGame()
-
-#     while True:
-#         action = None
-#         for event in pygame.event.get():
-#             if event.type == pygame.QUIT:
-#                 pygame.quit()
-#                 quit()
-#             elif event.type == pygame.KEYDOWN:
-#                 if event.key == pygame.K_UP:
-#                     action = Direction.UP
-#                 elif event.key == pygame.K_DOWN:
-#                     action = Direction.DOWN
-#                 elif event.key == pygame.K_LEFT:
-#                     action = Direction.LEFT
-#                 elif event.key == pygame.K_RIGHT:
-#                     action = Direction.RIGHT
-
-#         reward, game_over, score = game.play_step(action)
-
-#         if game_over:
-#             break
-
-#     print('Final Score', score)
-
-#     pygame.quit()
