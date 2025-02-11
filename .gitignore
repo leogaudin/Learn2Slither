@@ -1,6 +1,8 @@
 .vscode/
 *.pkl
 *.npz
+*.pth
+*.pt
 *.png
 .DS_Store
 *.safetensors

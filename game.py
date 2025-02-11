@@ -2,6 +2,9 @@ import pygame
 import random
 from enum import Enum
 from collections import namedtuple
+import numpy as np
+
+pygame.font.init()
 
 Point = namedtuple('Point', 'x, y')
 
@@ -41,8 +44,14 @@ class SnakeGame:
         self.reset()
 
     def reset(self):
-        self.direction = Direction.RIGHT
-        self.head = Point(self.width // 2, self.height // 2)
+        self.direction = random.choice(list(Direction))
+        # self.head = Point(self.width // 2, self.height // 2)
+        self.head = Point(
+            random.randint(0, (self.width - BLOCK_SIZE) // BLOCK_SIZE)
+            * BLOCK_SIZE,
+            random.randint(0, (self.height - BLOCK_SIZE) // BLOCK_SIZE)
+            * BLOCK_SIZE,
+        )
         self.snake = [
             self.head,
             Point(self.head.x - BLOCK_SIZE, self.head.y),
@@ -78,13 +87,11 @@ class SnakeGame:
 
             self.red_apples.append(Point(x, y))
 
-    def play_step(self, action=None):
-        if action is None:
-            action = self.direction
-        else:
-            self.direction = action
+    def play_step(self, direction=None, to_display: list[str] = []):
+        self.direction = self._move(
+            direction if direction is not None else self.direction
+        )
 
-        self._move(action)
         self.snake.insert(0, self.head)
         self.score = len(self.snake) - 3
 
@@ -92,11 +99,11 @@ class SnakeGame:
         reward = -1
 
         if self.head in self.green_apples:
-            reward += 1
+            reward = 5
             self.green_apples.remove(self.head)
             self._place_food()
         elif self.head in self.red_apples:
-            reward -= 1
+            reward = -5
             self.red_apples.remove(self.head)
             self._place_food()
             self.snake.pop()
@@ -104,26 +111,25 @@ class SnakeGame:
         else:
             self.snake.pop()
 
-        if self.score <= 0 or self._is_collision():
-            reward -= 10
-            game_over = True
-            return reward, game_over, self.score
-
-        self._update_ui()
+        self._update_ui(to_display)
         self.clock.tick(SPEED)
+
+        if len(self.snake) <= 0 or self.is_collision(self.head):
+            reward = -10
+            game_over = True
 
         return reward, game_over, self.score
 
-    def _is_collision(self):
-        if self.head.x > self.width - BLOCK_SIZE or self.head.x < 0 \
-                or self.head.y > self.height - BLOCK_SIZE or self.head.y < 0:
+    def is_collision(self, point):
+        if point.x > self.width - BLOCK_SIZE or point.x < 0 \
+                or point.y > self.height - BLOCK_SIZE or point.y < 0:
             return True
-        if self.head in self.snake[1:]:
+        if point in self.snake[1:]:
             return True
 
         return False
 
-    def _update_ui(self):
+    def _update_ui(self, to_display=[]):
         self.display.fill(WHITE)
 
         for pt in self.snake:
@@ -150,6 +156,16 @@ class SnakeGame:
                 )
             )
 
+        text = 'Score: ' + str(self.score)
+        font = pygame.font.Font(None, 30)
+        score = font.render(text, True, FT_BLUE)
+        x = BLOCK_SIZE
+        y = BLOCK_SIZE
+        for line in to_display:
+            score = font.render(line, True, FT_BLUE)
+            self.display.blit(score, (x, y))
+            y += BLOCK_SIZE * 1.5
+
         pygame.display.flip()
 
     def _move(self, direction):
@@ -166,35 +182,179 @@ class SnakeGame:
 
         self.head = Point(x, y)
 
+        return direction
 
-if __name__ == '__main__':
-    game = SnakeGame()
+    def _distance(self, point1, point2):
+        if not (point1.x == point2.x or point1.y == point2.y):
+            return -1
 
-    while True:
-        action = None
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_UP:
-                    action = Direction.UP
-                elif event.key == pygame.K_DOWN:
-                    action = Direction.DOWN
-                elif event.key == pygame.K_LEFT:
-                    action = Direction.LEFT
-                elif event.key == pygame.K_RIGHT:
-                    action = Direction.RIGHT
+        distance = ((point1.x - point2.x) ** 2
+                    + (point1.y - point2.y) ** 2) ** 0.5
 
-        reward, game_over, score = game.play_step(action)
+        return distance
 
-        # print('Reward', reward)
-        # print('Game Over', game_over)
-        # print('Score', score)
+    def _direction(self, point1, point2):
+        direction = None
+        if point1.x == point2.x:
+            if point1.y < point2.y:
+                direction = Direction.DOWN
+            else:
+                direction = Direction.UP
+        elif point1.y == point2.y:
+            if point1.x < point2.x:
+                direction = Direction.RIGHT
+            else:
+                direction = Direction.LEFT
 
-        if game_over:
-            break
+        return direction
 
-    print('Final Score', score)
+    def relative_to_absolute(self, direction):
+        clock = [Direction.RIGHT, Direction.DOWN, Direction.LEFT, Direction.UP]
+        i = clock.index(self.direction)
+        choices = [
+            i,  # straight
+            (i - 1) % 4,  # left
+            (i + 1) % 4,  # right
+        ]
+        return clock[choices[np.argmax(direction)]]
 
-    pygame.quit()
+    def get_state(self):
+        head = self.snake[0] if len(self.snake) > 0 else self.head
+        point_l = Point(head.x - 20, head.y)
+        point_r = Point(head.x + 20, head.y)
+        point_u = Point(head.x, head.y - 20)
+        point_d = Point(head.x, head.y + 20)
+
+        dir_l = self.direction == Direction.LEFT
+        dir_r = self.direction == Direction.RIGHT
+        dir_u = self.direction == Direction.UP
+        dir_d = self.direction == Direction.DOWN
+
+        state = [  # Stolen state to check if it works lol
+            # Danger straight
+            (dir_r and self.is_collision(point_r)) or
+            (dir_l and self.is_collision(point_l)) or
+            (dir_u and self.is_collision(point_u)) or
+            (dir_d and self.is_collision(point_d)),
+
+            # Danger right
+            (dir_u and self.is_collision(point_r)) or
+            (dir_d and self.is_collision(point_l)) or
+            (dir_l and self.is_collision(point_u)) or
+            (dir_r and self.is_collision(point_d)),
+
+            # Danger left
+            (dir_d and self.is_collision(point_r)) or
+            (dir_u and self.is_collision(point_l)) or
+            (dir_r and self.is_collision(point_u)) or
+            (dir_l and self.is_collision(point_d)),
+
+            # Move direction
+            dir_l,
+            dir_r,
+            dir_u,
+            dir_d,
+
+            # Food location
+            any([self.head.x < food.x for food in self.green_apples]),
+            any([self.head.x > food.x for food in self.green_apples]),
+            any([self.head.y < food.y for food in self.green_apples]),
+            any([self.head.y > food.y for food in self.green_apples]),
+
+            any([self.head.x < food.x for food in self.red_apples]),
+            any([self.head.x > food.x for food in self.red_apples]),
+            any([self.head.y < food.y for food in self.red_apples]),
+            any([self.head.y > food.y for food in self.red_apples]),
+            ]
+
+        return state
+
+    # def get_state(self):
+    #     head = self.snake[0]
+
+    #     left_wall = Point(0, head.y)
+    #     right_wall = Point(self.width - BLOCK_SIZE, head.y)
+    #     top_wall = Point(head.x, 0)
+    #     bottom_wall = Point(head.x, self.height - BLOCK_SIZE)
+
+    #     green_apple_up = \
+    #         Direction.UP == self._direction(head, self.green_apples[0])\
+    #         or Direction.UP == self._direction(head, self.green_apples[1])
+
+    #     green_apple_down = \
+    #         Direction.DOWN == self._direction(head, self.green_apples[0])\
+    #         or Direction.DOWN == self._direction(head, self.green_apples[1])
+
+    #     green_apple_left = \
+    #         Direction.LEFT == self._direction(head, self.green_apples[0])\
+    #         or Direction.LEFT == self._direction(head, self.green_apples[1])
+
+    #     green_apple_right = \
+    #         Direction.RIGHT == self._direction(head, self.green_apples[0])\
+    #         or Direction.RIGHT == self._direction(head, self.green_apples[1])
+
+    #     red_apple_up = \
+    #         Direction.UP == self._direction(head, self.red_apples[0])
+    #     red_apple_down = \
+    #         Direction.DOWN == self._direction(head, self.red_apples[0])
+    #     red_apple_left = \
+    #         Direction.LEFT == self._direction(head, self.red_apples[0])
+    #     red_apple_right = \
+    #         Direction.RIGHT == self._direction(head, self.red_apples[0])
+
+    #     state = [
+    #         self.direction == Direction.UP,
+    #         self.direction == Direction.DOWN,
+    #         self.direction == Direction.LEFT,
+    #         self.direction == Direction.RIGHT,
+
+    #         self._distance(head, top_wall),
+    #         self._distance(head, bottom_wall),
+    #         self._distance(head, left_wall),
+    #         self._distance(head, right_wall),
+
+    #         self._distance(head, self.green_apples[0]),
+    #         self._distance(head, self.green_apples[1]),
+    #         self._distance(head, self.red_apples[0]),
+
+    #         green_apple_up,
+    #         green_apple_down,
+    #         green_apple_left,
+    #         green_apple_right,
+
+    #         red_apple_up,
+    #         red_apple_down,
+    #         red_apple_left,
+    #         red_apple_right,
+    #     ]
+
+    #     return state
+
+
+# if __name__ == '__main__':
+#     game = SnakeGame()
+
+#     while True:
+#         action = None
+#         for event in pygame.event.get():
+#             if event.type == pygame.QUIT:
+#                 pygame.quit()
+#                 quit()
+#             elif event.type == pygame.KEYDOWN:
+#                 if event.key == pygame.K_UP:
+#                     action = Direction.UP
+#                 elif event.key == pygame.K_DOWN:
+#                     action = Direction.DOWN
+#                 elif event.key == pygame.K_LEFT:
+#                     action = Direction.LEFT
+#                 elif event.key == pygame.K_RIGHT:
+#                     action = Direction.RIGHT
+
+#         reward, game_over, score = game.play_step(action)
+
+#         if game_over:
+#             break
+
+#     print('Final Score', score)
+
+#     pygame.quit()
