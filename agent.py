@@ -13,7 +13,7 @@ class Agent:
         self.memory = deque(maxlen=max_memory)
         self.batch_size = batch_size
         self.model = DQN(
-            n_observations=15,
+            n_observations=9,
             n_actions=3,
         ).to(device)
         self.trainer = Trainer(self.model, lr, gamma)
@@ -40,14 +40,15 @@ class Agent:
         if random.uniform(0, 1) < self.epsilon:
             choice = random.randint(0, 2)
             action[choice] = 1
+            print(f"Random action: {action}")
         else:
-            with torch.no_grad():
-                state = torch.tensor(
-                    state,
-                    dtype=torch.float32
-                ).to(device)
-                prediction = self.model(state)
-                choice = torch.argmax(prediction).item()
-                action[choice] = 1
+            state = torch.tensor(
+                state,
+                dtype=torch.float32
+            ).to(device)
+            prediction = self.model(state)
+            choice = torch.argmax(prediction).item()
+            action[choice] = 1
+            print(f"Predicted action: {action}")
 
         return action

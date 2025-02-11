@@ -6,7 +6,7 @@ import numpy as np
 
 pygame.font.init()
 
-Point = namedtuple('Point', 'x, y')
+Point = namedtuple("Point", "x, y")
 
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
@@ -23,7 +23,6 @@ class Direction(Enum):
 
 
 BLOCK_SIZE = 20
-SPEED = 10
 
 GREEN_APPLES = 2
 RED_APPLES = 1
@@ -33,29 +32,28 @@ class SnakeGame:
     def __init__(self, width=760, height=520):
         if width % (BLOCK_SIZE * 2) != 0 or height % (BLOCK_SIZE * 2) != 0:
             raise Exception(
-                'Width and Height must be multiples of ' + str(BLOCK_SIZE * 2)
+                "Width and Height must be multiples of " + str(BLOCK_SIZE * 2)
             )
 
         self.width = width
         self.height = height
         self.display = pygame.display.set_mode((self.width, self.height))
-        pygame.display.set_caption('Learn2Slither')
+        pygame.display.set_caption("Learn2Slither")
         self.clock = pygame.time.Clock()
         self.reset()
 
     def reset(self):
         self.direction = random.choice(list(Direction))
-        # self.head = Point(self.width // 2, self.height // 2)
         self.head = Point(
-            random.randint(0, (self.width - BLOCK_SIZE) // BLOCK_SIZE)
-            * BLOCK_SIZE,
-            random.randint(0, (self.height - BLOCK_SIZE) // BLOCK_SIZE)
-            * BLOCK_SIZE,
+            random.randint(0, (self.width - BLOCK_SIZE)
+                           // BLOCK_SIZE) * BLOCK_SIZE,
+            random.randint(0, (self.height - BLOCK_SIZE)
+                           // BLOCK_SIZE) * BLOCK_SIZE,
         )
         self.snake = [
             self.head,
             Point(self.head.x - BLOCK_SIZE, self.head.y),
-            Point(self.head.x - (2 * BLOCK_SIZE), self.head.y)
+            Point(self.head.x - (2 * BLOCK_SIZE), self.head.y),
         ]
         self.score = 0
         self.green_apples = []
@@ -64,30 +62,41 @@ class SnakeGame:
 
     def _place_food(self):
         while len(self.green_apples) < GREEN_APPLES:
-            x = random.randint(0, (self.width - BLOCK_SIZE) // BLOCK_SIZE) \
-                * BLOCK_SIZE
-            y = random.randint(0, (self.height - BLOCK_SIZE) // BLOCK_SIZE) \
-                * BLOCK_SIZE
+            x = random.randint(0, (self.width - BLOCK_SIZE)
+                               // BLOCK_SIZE) * BLOCK_SIZE
+            y = random.randint(0, (self.height - BLOCK_SIZE)
+                               // BLOCK_SIZE) * BLOCK_SIZE
 
-            if Point(x, y) in self.snake or Point(x, y) in self.green_apples \
-                    or Point(x, y) in self.red_apples:
+            if (
+                Point(x, y) in self.snake
+                or Point(x, y) in self.green_apples
+                or Point(x, y) in self.red_apples
+            ):
                 continue
 
             self.green_apples.append(Point(x, y))
 
         while len(self.red_apples) < RED_APPLES:
-            x = random.randint(0, (self.width - BLOCK_SIZE) // BLOCK_SIZE) \
-                * BLOCK_SIZE
-            y = random.randint(0, (self.height - BLOCK_SIZE) // BLOCK_SIZE) \
-                * BLOCK_SIZE
+            x = random.randint(0, (self.width - BLOCK_SIZE)
+                               // BLOCK_SIZE) * BLOCK_SIZE
+            y = random.randint(0, (self.height - BLOCK_SIZE)
+                               // BLOCK_SIZE) * BLOCK_SIZE
 
-            if Point(x, y) in self.snake or Point(x, y) in self.green_apples \
-                    or Point(x, y) in self.red_apples:
+            if (
+                Point(x, y) in self.snake
+                or Point(x, y) in self.green_apples
+                or Point(x, y) in self.red_apples
+            ):
                 continue
 
             self.red_apples.append(Point(x, y))
 
-    def play_step(self, direction=None, to_display: list[str] = []):
+    def play_step(
+        self,
+        direction=None,
+        fps: int = 0,
+        to_display: list[str] = []
+    ):
         self.direction = self._move(
             direction if direction is not None else self.direction
         )
@@ -112,17 +121,21 @@ class SnakeGame:
             self.snake.pop()
 
         self._update_ui(to_display)
-        self.clock.tick(SPEED)
+        self.clock.tick(fps)
 
         if len(self.snake) <= 0 or self.is_collision(self.head):
-            reward = -10
+            reward = -100
             game_over = True
 
         return reward, game_over, self.score
 
     def is_collision(self, point):
-        if point.x > self.width - BLOCK_SIZE or point.x < 0 \
-                or point.y > self.height - BLOCK_SIZE or point.y < 0:
+        if (
+            point.x > self.width - BLOCK_SIZE
+            or point.x < 0
+            or point.y > self.height - BLOCK_SIZE
+            or point.y < 0
+        ):
             return True
         if point in self.snake[1:]:
             return True
@@ -135,28 +148,22 @@ class SnakeGame:
         for pt in self.snake:
             pygame.draw.rect(
                 self.display, FT_BLUE,
-                pygame.Rect(
-                    pt.x, pt.y, BLOCK_SIZE, BLOCK_SIZE
-                )
+                pygame.Rect(pt.x, pt.y, BLOCK_SIZE, BLOCK_SIZE)
             )
 
         for pt in self.green_apples:
             pygame.draw.rect(
                 self.display, GREEN,
-                pygame.Rect(
-                    pt.x, pt.y, BLOCK_SIZE, BLOCK_SIZE
-                )
+                pygame.Rect(pt.x, pt.y, BLOCK_SIZE, BLOCK_SIZE)
             )
 
         for pt in self.red_apples:
             pygame.draw.rect(
                 self.display, RED,
-                pygame.Rect(
-                    pt.x, pt.y, BLOCK_SIZE, BLOCK_SIZE
-                )
+                pygame.Rect(pt.x, pt.y, BLOCK_SIZE, BLOCK_SIZE)
             )
 
-        text = 'Score: ' + str(self.score)
+        text = "Score: " + str(self.score)
         font = pygame.font.Font(None, 30)
         score = font.render(text, True, FT_BLUE)
         x = BLOCK_SIZE
@@ -218,6 +225,26 @@ class SnakeGame:
         ]
         return clock[choices[np.argmax(direction)]]
 
+    def _is_there_point(self, from_point, to_points, direction):
+        if direction == Direction.RIGHT:
+            return any([from_point.x < to_point.x
+                        and from_point.y == to_point.y
+                        for to_point in to_points])
+        elif direction == Direction.LEFT:
+            return any([from_point.x > to_point.x
+                        and from_point.y == to_point.y
+                        for to_point in to_points])
+        elif direction == Direction.UP:
+            return any([from_point.y > to_point.y
+                        and from_point.x == to_point.x
+                        for to_point in to_points])
+        elif direction == Direction.DOWN:
+            return any([from_point.y < to_point.y
+                        and from_point.x == to_point.x
+                        for to_point in to_points])
+
+        return False
+
     def get_state(self):
         head = self.snake[0] if len(self.snake) > 0 else self.head
         point_l = Point(head.x - 20, head.y)
@@ -230,42 +257,47 @@ class SnakeGame:
         dir_u = self.direction == Direction.UP
         dir_d = self.direction == Direction.DOWN
 
-        state = [  # Stolen state to check if it works lol
-            # Danger straight
-            (dir_r and self.is_collision(point_r)) or
-            (dir_l and self.is_collision(point_l)) or
-            (dir_u and self.is_collision(point_u)) or
-            (dir_d and self.is_collision(point_d)),
+        clock = [Direction.RIGHT, Direction.DOWN, Direction.LEFT, Direction.UP]
+        current = clock.index(self.direction)
+        straight = clock[current]
+        left = clock[(current - 1) % 4]
+        right = clock[(current + 1) % 4]
 
-            # Danger right
-            (dir_u and self.is_collision(point_r)) or
-            (dir_d and self.is_collision(point_l)) or
-            (dir_l and self.is_collision(point_u)) or
-            (dir_r and self.is_collision(point_d)),
-
-            # Danger left
-            (dir_d and self.is_collision(point_r)) or
-            (dir_u and self.is_collision(point_l)) or
-            (dir_r and self.is_collision(point_u)) or
-            (dir_l and self.is_collision(point_d)),
-
-            # Move direction
-            dir_l,
-            dir_r,
-            dir_u,
-            dir_d,
-
-            # Food location
-            any([self.head.x < food.x for food in self.green_apples]),
-            any([self.head.x > food.x for food in self.green_apples]),
-            any([self.head.y < food.y for food in self.green_apples]),
-            any([self.head.y > food.y for food in self.green_apples]),
-
-            any([self.head.x < food.x for food in self.red_apples]),
-            any([self.head.x > food.x for food in self.red_apples]),
-            any([self.head.y < food.y for food in self.red_apples]),
-            any([self.head.y > food.y for food in self.red_apples]),
-            ]
+        state = [
+            {
+                "label": "danger_straight",
+                "value": (dir_r and self.is_collision(point_r))
+                or (dir_l and self.is_collision(point_l))
+                or (dir_u and self.is_collision(point_u))
+                or (dir_d and self.is_collision(point_d)),
+            },
+            {
+                "label": "danger_left",
+                "value": (dir_d and self.is_collision(point_r))
+                or (dir_u and self.is_collision(point_l))
+                or (dir_r and self.is_collision(point_u))
+                or (dir_l and self.is_collision(point_d)),
+            },
+            {
+                "label": "danger_right",
+                "value": (dir_u and self.is_collision(point_r))
+                or (dir_d and self.is_collision(point_l))
+                or (dir_l and self.is_collision(point_u))
+                or (dir_r and self.is_collision(point_d)),
+            },
+            {"label": "green_apple_straight",
+             "value": self._is_there_point(head, self.green_apples, straight)},
+            {"label": "green_apple_left",
+             "value": self._is_there_point(head, self.green_apples, left)},
+            {"label": "green_apple_right",
+             "value": self._is_there_point(head, self.green_apples, right)},
+            {"label": "red_apple_straight",
+             "value": self._is_there_point(head, self.red_apples, straight)},
+            {"label": "red_apple_left",
+             "value": self._is_there_point(head, self.red_apples, left)},
+            {"label": "red_apple_right",
+             "value": self._is_there_point(head, self.red_apples, right)}
+        ]
 
         return state
 
@@ -302,31 +334,38 @@ class SnakeGame:
     #     red_apple_right = \
     #         Direction.RIGHT == self._direction(head, self.red_apples[0])
 
-    #     state = [
-    #         self.direction == Direction.UP,
-    #         self.direction == Direction.DOWN,
-    #         self.direction == Direction.LEFT,
-    #         self.direction == Direction.RIGHT,
+    # state = [
+    #     {"label": "move_up", "value": self.direction == Direction.UP},
+    #     {"label": "move_down", "value": self.direction == Direction.DOWN},
+    #     {"label": "move_left", "value": self.direction == Direction.LEFT},
+    #     {"label": "move_right", "value": self.direction == Direction.RIGHT},
 
-    #         self._distance(head, top_wall),
-    #         self._distance(head, bottom_wall),
-    #         self._distance(head, left_wall),
-    #         self._distance(head, right_wall),
+    #     {"label": "distance_top_wall",
+    #      "value": self._distance(head, top_wall)},
+    #     {"label": "distance_bottom_wall",
+    #      "value": self._distance(head, bottom_wall)},
+    #     {"label": "distance_left_wall",
+    #      "value": self._distance(head, left_wall)},
+    #     {"label": "distance_right_wall",
+    #      "value": self._distance(head, right_wall)},
 
-    #         self._distance(head, self.green_apples[0]),
-    #         self._distance(head, self.green_apples[1]),
-    #         self._distance(head, self.red_apples[0]),
+    #     {"label": "distance_green_apple_1",
+    #      "value": self._distance(head, self.green_apples[0])},
+    #     {"label": "distance_green_apple_2",
+    #      "value": self._distance(head, self.green_apples[1])},
+    #     {"label": "distance_red_apple",
+    #      "value": self._distance(head, self.red_apples[0])},
 
-    #         green_apple_up,
-    #         green_apple_down,
-    #         green_apple_left,
-    #         green_apple_right,
+    #     {"label": "green_apple_up", "value": green_apple_up},
+    #     {"label": "green_apple_down", "value": green_apple_down},
+    #     {"label": "green_apple_left", "value": green_apple_left},
+    #     {"label": "green_apple_right", "value": green_apple_right},
 
-    #         red_apple_up,
-    #         red_apple_down,
-    #         red_apple_left,
-    #         red_apple_right,
-    #     ]
+    #     {"label": "red_apple_up", "value": red_apple_up},
+    #     {"label": "red_apple_down", "value": red_apple_down},
+    #     {"label": "red_apple_left", "value": red_apple_left},
+    #     {"label": "red_apple_right", "value": red_apple_right},
+    # ]
 
     #     return state
 

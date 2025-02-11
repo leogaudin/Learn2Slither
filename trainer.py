@@ -26,7 +26,7 @@ class Trainer:
         self.gamma = gamma
         self.model = model
         self.optimizer = optim.Adam(model.parameters(), lr=lr)
-        self.criterion = nn.HuberLoss()
+        self.criterion = nn.MSELoss()
 
     def train_step(self, state, action, reward, next_state, done):
         state = torch.tensor(state, dtype=torch.float32).to(device)
@@ -55,5 +55,6 @@ class Trainer:
         self.optimizer.zero_grad()
         loss = self.criterion(target, prediction)
         loss.backward()
+        print('Loss:', loss)
         # getBack(loss.grad_fn)
         self.optimizer.step()

@@ -8,6 +8,7 @@ import sys
 def main():
     step_by_step = any(arg == '--step' for arg in sys.argv)
     manual = any(arg == '--manual' for arg in sys.argv)
+    fps = 60 if not manual else 0
 
     best_score = 0
     games = 0
@@ -18,8 +19,8 @@ def main():
         gamma=0.9,
         epsilon=0.1,
         lr=0.001,
-        max_memory=100_000,
-        batch_size=1_000
+        max_memory=1_000_000,
+        batch_size=1_024,
     )
     game = SnakeGame()
 
@@ -47,15 +48,20 @@ def main():
         if not execute:
             continue
 
-        state = game.get_state()
+        state_with_labels = game.get_state()
+        state = [element['value'] for element in state_with_labels]
 
         if not manual:
             action = agent.get_action(state)
             move = game.relative_to_absolute(action)
 
-        (reward, done, score) = game.play_step(direction=move)
+        (reward, done, score) = game.play_step(
+            direction=move,
+            fps=fps,
+        )
 
-        next_state = game.get_state()
+        next_state_with_labels = game.get_state()
+        next_state = [element['value'] for element in next_state_with_labels]
 
         logs = [
             f"Score: {score}",
@@ -63,11 +69,15 @@ def main():
             f"Games Played: {games}",
             f"Head: {game.snake[0] if len(game.snake) > 0 else None}",
             f"Move: {move}",
-            f"State: {state}",
-            f"Next State: {next_state}",
             f"Reward: {reward}",
             f"Done: {done}",
         ]
+
+        for element in state_with_labels:
+            logs.append(f"State {element['label']}: {element['value']}")
+
+        for element in next_state_with_labels:
+            logs.append(f"Next State {element['label']}: {element['value']}")
 
         for log in logs:
             print(log)
