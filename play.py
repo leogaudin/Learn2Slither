@@ -13,8 +13,9 @@ def main():
     fps = 60 if not manual else 0
     load_model = \
         next((arg for arg in sys.argv if arg.startswith('--model=')), None) \
-        .split('=')[1] \
         if not manual else None
+    load_model = load_model.split('=')[1] \
+        if load_model is not None else None
 
     best_score = 0
     games = 0
@@ -35,6 +36,7 @@ def main():
     game = SnakeGame(
         width=config['game_width'],
         height=config['game_height'],
+        block_size=config['block_size'],
         fps=fps,
         green_apples_count=config['green_apples_count'],
         red_apples_count=config['red_apples_count'],

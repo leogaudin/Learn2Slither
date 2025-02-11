@@ -22,25 +22,24 @@ class Direction(Enum):
     DOWN = 4
 
 
-BLOCK_SIZE = 20
-
-
 class SnakeGame:
     def __init__(
         self,
         width=760,
         height=520,
+        block_size=20,
         fps=0,
         green_apples_count=2,
         red_apples_count=1,
     ):
-        if width % (BLOCK_SIZE * 2) != 0 or height % (BLOCK_SIZE * 2) != 0:
+        if width % (block_size * 2) != 0 or height % (block_size * 2) != 0:
             raise Exception(
-                "Width and Height must be multiples of " + str(BLOCK_SIZE * 2)
+                "Width and Height must be multiples of " + str(block_size * 2)
             )
 
         self.width = width
         self.height = height
+        self.block_size = block_size
         self.fps = fps
         self.green_apples_count = green_apples_count
         self.red_apples_count = red_apples_count
@@ -53,15 +52,15 @@ class SnakeGame:
         self.time_alive = 0
         self.direction = random.choice(list(Direction))
         self.head = Point(
-            random.randint(0, (self.width - BLOCK_SIZE)
-                           // BLOCK_SIZE) * BLOCK_SIZE,
-            random.randint(0, (self.height - BLOCK_SIZE)
-                           // BLOCK_SIZE) * BLOCK_SIZE,
+            random.randint(0, (self.width - self.block_size)
+                           // self.block_size) * self.block_size,
+            random.randint(0, (self.height - self.block_size)
+                           // self.block_size) * self.block_size,
         )
         self.snake = [
             self.head,
-            Point(self.head.x - BLOCK_SIZE, self.head.y),
-            Point(self.head.x - (2 * BLOCK_SIZE), self.head.y),
+            Point(self.head.x - self.block_size, self.head.y),
+            Point(self.head.x - (2 * self.block_size), self.head.y),
         ]
         self.score = 0
         self.green_apples = []
@@ -70,10 +69,10 @@ class SnakeGame:
 
     def _place_food(self):
         while len(self.green_apples) < self.green_apples_count:
-            x = random.randint(0, (self.width - BLOCK_SIZE)
-                               // BLOCK_SIZE) * BLOCK_SIZE
-            y = random.randint(0, (self.height - BLOCK_SIZE)
-                               // BLOCK_SIZE) * BLOCK_SIZE
+            x = random.randint(0, (self.width - self.block_size)
+                               // self.block_size) * self.block_size
+            y = random.randint(0, (self.height - self.block_size)
+                               // self.block_size) * self.block_size
 
             if (
                 Point(x, y) in self.snake
@@ -85,10 +84,10 @@ class SnakeGame:
             self.green_apples.append(Point(x, y))
 
         while len(self.red_apples) < self.red_apples_count:
-            x = random.randint(0, (self.width - BLOCK_SIZE)
-                               // BLOCK_SIZE) * BLOCK_SIZE
-            y = random.randint(0, (self.height - BLOCK_SIZE)
-                               // BLOCK_SIZE) * BLOCK_SIZE
+            x = random.randint(0, (self.width - self.block_size)
+                               // self.block_size) * self.block_size
+            y = random.randint(0, (self.height - self.block_size)
+                               // self.block_size) * self.block_size
 
             if (
                 Point(x, y) in self.snake
@@ -134,7 +133,7 @@ class SnakeGame:
         if len(self.snake) <= 0 \
                 or self.is_collision(self.head) \
                 or self.time_alive \
-                > self.width * self.height / (BLOCK_SIZE ** 2):
+                > self.width * self.height / (self.block_size ** 2):
             reward = -100
             game_over = True
 
@@ -142,9 +141,9 @@ class SnakeGame:
 
     def is_collision(self, point):
         if (
-            point.x > self.width - BLOCK_SIZE
+            point.x > self.width - self.block_size
             or point.x < 0
-            or point.y > self.height - BLOCK_SIZE
+            or point.y > self.height - self.block_size
             or point.y < 0
         ):
             return True
@@ -159,30 +158,30 @@ class SnakeGame:
         for pt in self.snake:
             pygame.draw.rect(
                 self.display, FT_BLUE,
-                pygame.Rect(pt.x, pt.y, BLOCK_SIZE, BLOCK_SIZE)
+                pygame.Rect(pt.x, pt.y, self.block_size, self.block_size)
             )
 
         for pt in self.green_apples:
             pygame.draw.rect(
                 self.display, GREEN,
-                pygame.Rect(pt.x, pt.y, BLOCK_SIZE, BLOCK_SIZE)
+                pygame.Rect(pt.x, pt.y, self.block_size, self.block_size)
             )
 
         for pt in self.red_apples:
             pygame.draw.rect(
                 self.display, RED,
-                pygame.Rect(pt.x, pt.y, BLOCK_SIZE, BLOCK_SIZE)
+                pygame.Rect(pt.x, pt.y, self.block_size, self.block_size)
             )
 
         text = "Score: " + str(self.score)
         font = pygame.font.Font(None, 30)
         score = font.render(text, True, FT_BLUE)
-        x = BLOCK_SIZE
-        y = BLOCK_SIZE
+        x = self.block_size
+        y = self.block_size
         for line in to_display:
             score = font.render(line, True, FT_BLUE)
             self.display.blit(score, (x, y))
-            y += BLOCK_SIZE * 1.5
+            y += self.block_size * 1.5
 
         pygame.display.flip()
 
@@ -190,13 +189,13 @@ class SnakeGame:
         x = self.head.x
         y = self.head.y
         if direction == Direction.RIGHT:
-            x += BLOCK_SIZE
+            x += self.block_size
         elif direction == Direction.LEFT:
-            x -= BLOCK_SIZE
+            x -= self.block_size
         elif direction == Direction.DOWN:
-            y += BLOCK_SIZE
+            y += self.block_size
         elif direction == Direction.UP:
-            y -= BLOCK_SIZE
+            y -= self.block_size
 
         self.head = Point(x, y)
 
