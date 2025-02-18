@@ -44,7 +44,7 @@ class SnakeGame:
         self.height = height
         self.block_size = block_size
         self.fps = fps
-        self.green_apples_count = np.mean(width, height) // block_size // 10
+        self.green_apples_count = np.mean([width, height]) // block_size // 10
         self.red_apples_count = self.green_apples_count // 2
         self.green_apple_reward = green_apple_reward
         self.red_apple_reward = red_apple_reward

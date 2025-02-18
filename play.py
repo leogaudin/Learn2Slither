@@ -39,8 +39,6 @@ def main():
         height=config['game_height'],
         block_size=config['block_size'],
         fps=fps,
-        green_apples_count=config['green_apples_count'],
-        red_apples_count=config['red_apples_count'],
         alive_reward=config['alive_reward'],
         death_reward=config['death_reward'],
         invisible=invisible,
