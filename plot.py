@@ -5,7 +5,6 @@ plt.ion()
 
 def plot(scores, mean_scores):
     plt.clf()
-    plt.title('Training...')
     plt.xlabel('Number of Games')
     plt.ylabel('Score')
     plt.plot(scores)
