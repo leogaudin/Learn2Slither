@@ -125,7 +125,7 @@ class SnakeGame:
         self.score = len(self.snake) - 3
 
         game_over = False
-        reward = self.alive_reward - 1 / (10000 * self._move_std_dev()) \
+        reward = self.alive_reward / self._move_std_dev() \
             if len(self.move_history) > 2 \
             else self.alive_reward
 
@@ -146,9 +146,7 @@ class SnakeGame:
         self.clock.tick(self.fps)
 
         if len(self.snake) <= 0 \
-                or self.is_collision(self.head) \
-                or self.time_alive \
-                > self.width * self.height / (self.block_size ** 2):
+                or self.is_collision(self.head):
             reward = self.death_reward
             game_over = True
 
@@ -275,9 +273,12 @@ class SnakeGame:
             return 0
 
         coordinates = [move['head'] for move in self.move_history[-10:]]
-        x = [point.x for point in coordinates]
-        y = [point.y for point in coordinates]
-        std_dev = np.mean([np.std(x), np.std(y)]) / (self.width * self.height)
+        x = np.array([point.x for point in coordinates])
+        y = np.array([point.y for point in coordinates])
+        std_dev = np.mean([
+            np.std(x),
+            np.std(y)
+        ]) / self.block_size
 
         return std_dev
 

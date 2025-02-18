@@ -99,11 +99,11 @@ def main():
             f"Done: {done}",
         ]
 
-        for element in state_with_labels:
-            logs.append(f"State {element['label']}: {element['value']}")
+        # for element in state_with_labels:
+        #     logs.append(f"State {element['label']}: {element['value']}")
 
-        for element in next_state_with_labels:
-            logs.append(f"Next State {element['label']}: {element['value']}")
+        # for element in next_state_with_labels:
+        #     logs.append(f"Next State {element['label']}: {element['value']}")
 
         for log in logs:
             print(log)
