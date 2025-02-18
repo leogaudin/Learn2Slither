@@ -40,7 +40,8 @@ class Agent:
         if random.uniform(0, 1) < self.epsilon:
             choice = random.randint(0, 2)
             action[choice] = 1
-            print(f"Random action: {action}")
+            if config['debug']:
+                print(f"Random action: {action}")
         else:
             with torch.no_grad():
                 state = torch.tensor(
@@ -51,6 +52,7 @@ class Agent:
                 prediction = self.model(state)
                 choice = prediction.argmax().item()
                 action[choice] = 1
-                print(f"Predicted action: {action}")
+                if config['debug']:
+                    print(f"Predicted action: {action}")
 
         return action

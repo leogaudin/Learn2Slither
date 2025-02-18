@@ -29,12 +29,11 @@ class SnakeGame:
         height=520,
         block_size=20,
         fps=0,
-        green_apples_count=2,
-        red_apples_count=1,
-        green_apple_reward=5,
-        red_apple_reward=-5,
-        alive_reward=-1,
+        green_apple_reward=20,
+        red_apple_reward=-20,
+        alive_reward=-0.5,
         death_reward=-100,
+        invisible=False,
     ):
         if width % (block_size * 2) != 0 or height % (block_size * 2) != 0:
             raise Exception(
@@ -45,12 +44,14 @@ class SnakeGame:
         self.height = height
         self.block_size = block_size
         self.fps = fps
-        self.green_apples_count = green_apples_count
-        self.red_apples_count = red_apples_count
+        self.green_apples_count = np.mean(width, height) // block_size // 10
+        self.red_apples_count = self.green_apples_count // 2
         self.green_apple_reward = green_apple_reward
         self.red_apple_reward = red_apple_reward
         self.alive_reward = alive_reward
         self.death_reward = death_reward
+        self.invisible = invisible
+
         self.display = pygame.display.set_mode((self.width, self.height))
         pygame.display.set_caption("Learn2Slither")
         self.clock = pygame.time.Clock()
@@ -142,8 +143,9 @@ class SnakeGame:
         else:
             self.snake.pop()
 
-        self._update_ui(to_display)
-        self.clock.tick(self.fps)
+        if not self.invisible:
+            self._update_ui(to_display)
+            self.clock.tick(self.fps)
 
         if len(self.snake) <= 0 \
                 or self.is_collision(self.head):

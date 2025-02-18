@@ -29,5 +29,16 @@ def get_args(args: list[str]):
         if train else None
     episodes = int(episodes.split('=')[1]) \
         if episodes is not None else None
+    invisible = any(arg == '--invisible' for arg in args)
+    verbose = any(arg == '--verbose' for arg in args)
 
-    return step_by_step, manual, train, fps, load_model, episodes
+    return (
+        step_by_step,
+        manual,
+        train,
+        fps,
+        load_model,
+        episodes,
+        invisible,
+        verbose,
+    )

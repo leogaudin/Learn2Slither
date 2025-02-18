@@ -7,7 +7,16 @@ from settings import config, get_args
 
 
 def main():
-    step_by_step, manual, train, fps, load_model, episodes = get_args(sys.argv)
+    (
+        step_by_step,
+        manual,
+        train,
+        fps,
+        load_model,
+        episodes,
+        invisible,
+        verbose,
+    ) = get_args(sys.argv)
 
     best_score = 0
     games = 0
@@ -34,8 +43,7 @@ def main():
         red_apples_count=config['red_apples_count'],
         alive_reward=config['alive_reward'],
         death_reward=config['death_reward'],
-        green_apple_reward=config['green_apple_reward'],
-        red_apple_reward=config['red_apple_reward'],
+        invisible=invisible,
     )
 
     while True:
@@ -76,27 +84,29 @@ def main():
         next_state_with_labels = game.get_state()
         next_state = [element['value'] for element in next_state_with_labels]
 
-        logs = [
-            f"Score: {score}",
-            f"Mean Score: {mean_scores[-1] if mean_scores else 0}",
-            f"Highest Score: {best_score}",
-            f"Games Played: {games}",
-            f"Head: {game.snake[0] if len(game.snake) > 0 else None}",
-            f"Direction: {move}",
-            f"Reward: {reward}",
-            f"Done: {done}",
-        ]
+        if verbose:
+            logs = [
+                f"Score: {score}",
+                f"Mean Score: {mean_scores[-1] if mean_scores else 0}",
+                f"Highest Score: {best_score}",
+                f"Games Played: {games}",
+                f"Head: {game.snake[0] if len(game.snake) > 0 else None}",
+                f"Direction: {move}",
+                f"Reward: {reward}",
+                f"Done: {done}",
+            ]
 
-        # for element in state_with_labels:
-        #     logs.append(f"State {element['label']}: {element['value']}")
+            for element in state_with_labels:
+                logs.append(f"State {element['label']}: \
+                            {element['value']}")
+            # for element in next_state_with_labels:
+            #     logs.append(f"Next State {element['label']}: \
+            #                 {element['value']}")
 
-        # for element in next_state_with_labels:
-        #     logs.append(f"Next State {element['label']}: {element['value']}")
+            for log in logs:
+                print(log)
 
-        for log in logs:
-            print(log)
-
-        print()
+            print()
 
         if train:
             agent.train_short_memory(state, action, reward, next_state, done)

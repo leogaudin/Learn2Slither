@@ -1,4 +1,5 @@
 config:
+  debug: false
   models_path: './models/'
   gamma: 0.95
   epsilon_init: 0.9
@@ -7,11 +8,9 @@ config:
   lr: 0.01 # Keep it high enough to actually learn
   max_memory: 1000000
   batch_size: 1024
-  game_width: 200
-  game_height: 200
+  game_width: 800
+  game_height: 800
   block_size: 20
-  green_apples_count: 2
-  red_apples_count: 1
   alive_reward: -0.5
   death_reward: -100
   green_apple_reward: 20

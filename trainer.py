@@ -61,6 +61,7 @@ class Trainer:
         self.optimizer.zero_grad()
         loss = self.criterion(target, prediction)
         loss.backward()
-        print('Loss:', loss)
+        if config['debug']:
+            print('Loss:', loss)
         # getBack(loss.grad_fn)
         self.optimizer.step()
