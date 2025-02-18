@@ -3,24 +3,11 @@ from game import SnakeGame, Direction
 import pygame
 from plot import plot
 import sys
-from settings import config
+from settings import config, get_args
 
 
 def main():
-    step_by_step = any(arg == '--step' for arg in sys.argv)
-    manual = any(arg == '--manual' for arg in sys.argv)
-    train = any(arg == '--train' for arg in sys.argv) and not manual
-    fps = 60 if not manual else 0
-    load_model = \
-        next((arg for arg in sys.argv if arg.startswith('--model=')), None)\
-        if not manual else None
-    load_model = load_model.split('=')[1] \
-        if load_model is not None else None
-    episodes = \
-        next((arg for arg in sys.argv if arg.startswith('--episodes=')), None)\
-        if train else None
-    episodes = int(episodes.split('=')[1]) \
-        if episodes is not None else None
+    step_by_step, manual, train, fps, load_model, episodes = get_args(sys.argv)
 
     best_score = 0
     games = 0
@@ -91,10 +78,11 @@ def main():
 
         logs = [
             f"Score: {score}",
+            f"Mean Score: {mean_scores[-1] if mean_scores else 0}",
             f"Highest Score: {best_score}",
             f"Games Played: {games}",
             f"Head: {game.snake[0] if len(game.snake) > 0 else None}",
-            f"Move: {move}",
+            f"Direction: {move}",
             f"Reward: {reward}",
             f"Done: {done}",
         ]
@@ -125,9 +113,9 @@ def main():
                     agent.epsilon * config['epsilon_decay']
                 )
 
-                scores.append(score)
-                mean_scores.append(sum(scores) / max(games, 1))
-                plot(scores, mean_scores)
+            scores.append(score)
+            mean_scores.append(sum(scores) / max(games, 1))
+            plot(scores, mean_scores)
 
             if score > best_score:
                 best_score = score
@@ -144,6 +132,7 @@ def main():
                         "final_model"
                         + str(episodes) + "_episodes"
                         + "_best_score_" + str(best_score)
+                        + "_mean_score_" + str(mean_scores[-1])
                         + ".pth"
                     )
                 break

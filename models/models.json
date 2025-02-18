@@ -1,44 +1,46 @@
-{
-    "filename": "final_500_best_15",
-    "episodes": 500,
-    "best_score": 15,
-    "network": [13, 24, 24, 3],
-    "state": [
-        "move_std_dev",
-        "last_move_straight",
-        "last_move_left",
-        "last_move_right",
-        "danger_straight",
-        "danger_left",
-        "danger_right",
-        "green_apple_straight",
-        "green_apple_left",
-        "green_apple_right",
-        "red_apple_straight",
-        "red_apple_left",
-        "red_apple_right"
-    ],
-    "output": [
-        "go_straight",
-        "go_left",
-        "go_right"
-    ],
-    "config": {
-        "gamma": 0.95,
-        "epsilon_init": 0.9,
-        "epsilon_min": 0.2,
-        "epsilon_decay": 0.995,
-        "lr": 0.01,
-        "max_memory": 1000000,
-        "batch_size": 1024,
-        "game_width": 200,
-        "game_height": 200,
-        "block_size": 20,
-        "green_apples_count": 2,
-        "red_apples_count": 1,
-        "alive_reward": -0.5,
-        "death_reward": -100,
-        "green_apple_reward": 20,
-        "red_apple_reward": -20
+[
+    {
+        "filename": "smol_500.pth",
+        "episodes": 500,
+        "best_score": 19,
+        "network": [13, 42, 42, 3],
+        "state": [
+            "move_std_dev",
+            "last_move_straight",
+            "last_move_left",
+            "last_move_right",
+            "danger_straight",
+            "danger_left",
+            "danger_right",
+            "green_apple_straight",
+            "green_apple_left",
+            "green_apple_right",
+            "red_apple_straight",
+            "red_apple_left",
+            "red_apple_right"
+        ],
+        "output": [
+            "go_straight",
+            "go_left",
+            "go_right"
+        ],
+        "config": {
+            "gamma": 0.95,
+            "epsilon_init": 0.9,
+            "epsilon_min": 0.2,
+            "epsilon_decay": 0.995,
+            "lr": 0.01,
+            "max_memory": 1000000,
+            "batch_size": 1024,
+            "game_width": 200,
+            "game_height": 200,
+            "block_size": 20,
+            "green_apples_count": 2,
+            "red_apples_count": 1,
+            "alive_reward": -0.5,
+            "death_reward": -100,
+            "green_apple_reward": 20,
+            "red_apple_reward": -20
+        }
     }
-}
+]
