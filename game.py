@@ -31,6 +31,10 @@ class SnakeGame:
         fps=0,
         green_apples_count=2,
         red_apples_count=1,
+        green_apple_reward=5,
+        red_apple_reward=-5,
+        alive_reward=-1,
+        death_reward=-100,
     ):
         if width % (block_size * 2) != 0 or height % (block_size * 2) != 0:
             raise Exception(
@@ -43,12 +47,17 @@ class SnakeGame:
         self.fps = fps
         self.green_apples_count = green_apples_count
         self.red_apples_count = red_apples_count
+        self.green_apple_reward = green_apple_reward
+        self.red_apple_reward = red_apple_reward
+        self.alive_reward = alive_reward
+        self.death_reward = death_reward
         self.display = pygame.display.set_mode((self.width, self.height))
         pygame.display.set_caption("Learn2Slither")
         self.clock = pygame.time.Clock()
         self.reset()
 
     def reset(self):
+        self.move_history = []
         self.time_alive = 0
         self.direction = random.choice(list(Direction))
         self.head = Point(
@@ -107,19 +116,25 @@ class SnakeGame:
         self.direction = self._move(
             direction if direction is not None else self.direction
         )
+        self.move_history.append({
+            "head": self.head,
+            "move": self.direction
+        })
 
         self.snake.insert(0, self.head)
         self.score = len(self.snake) - 3
 
         game_over = False
-        reward = -1
+        reward = self.alive_reward - 1 / (10000 * self._move_std_dev()) \
+            if len(self.move_history) > 2 \
+            else self.alive_reward
 
         if self.head in self.green_apples:
-            reward = 5
+            reward = self.green_apple_reward
             self.green_apples.remove(self.head)
             self._place_food()
         elif self.head in self.red_apples:
-            reward = -5
+            reward = self.red_apple_reward
             self.red_apples.remove(self.head)
             self._place_food()
             self.snake.pop()
@@ -134,7 +149,7 @@ class SnakeGame:
                 or self.is_collision(self.head) \
                 or self.time_alive \
                 > self.width * self.height / (self.block_size ** 2):
-            reward = -100
+            reward = self.death_reward
             game_over = True
 
         return reward, game_over, self.score
@@ -255,6 +270,17 @@ class SnakeGame:
 
         return False
 
+    def _move_std_dev(self):
+        if len(self.move_history) < 2:
+            return 0
+
+        coordinates = [move['head'] for move in self.move_history[-10:]]
+        x = [point.x for point in coordinates]
+        y = [point.y for point in coordinates]
+        std_dev = np.mean([np.std(x), np.std(y)]) / (self.width * self.height)
+
+        return std_dev
+
     def get_state(self):
         head = self.snake[0] if len(self.snake) > 0 else self.head
         point_l = Point(head.x - 20, head.y)
@@ -268,16 +294,36 @@ class SnakeGame:
         dir_d = self.direction == Direction.DOWN
 
         clock = [Direction.RIGHT, Direction.DOWN, Direction.LEFT, Direction.UP]
+
         current = clock.index(self.direction)
         straight = clock[current]
         left = clock[(current - 1) % 4]
         right = clock[(current + 1) % 4]
 
+        previous = self.move_history[-2]['move'] if len(
+            self.move_history) > 1 else self.direction
+        previous = clock.index(previous)
+        last_move_straight = previous == current
+        last_move_left = previous == (current - 1) % 4
+        last_move_right = previous == (current + 1) % 4
+
         state = [
-            # {
-            #     "label": "time_alive",
-            #     "value": self.time_alive,
-            # },
+            {
+                "label": "move_std_dev",
+                "value": self._move_std_dev(),
+            },
+            {
+                "label": "last_move_straight",
+                "value": last_move_straight,
+            },
+            {
+                "label": "last_move_left",
+                "value": last_move_left,
+            },
+            {
+                "label": "last_move_right",
+                "value": last_move_right,
+            },
             {
                 "label": "danger_straight",
                 "value": (dir_r and self.is_collision(point_r))

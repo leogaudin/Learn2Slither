@@ -1,15 +1,18 @@
 config:
   models_path: './models/'
-  gamma: 0.9
+  gamma: 0.95
   epsilon_init: 0.9
-  epsilon_min: 0.0001
-  epsilon_decay: 0.95
-  lr: 0.001
+  epsilon_min: 0.2
+  epsilon_decay: 0.995
+  lr: 0.0005
   max_memory: 1000000
-  batch_size: 4096
+  batch_size: 1024
   game_width: 200
   game_height: 200
   block_size: 20
   green_apples_count: 2
   red_apples_count: 1
-
+  alive_reward: -0.5
+  death_reward: -100
+  green_apple_reward: 20
+  red_apple_reward: -20

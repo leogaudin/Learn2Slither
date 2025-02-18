@@ -12,10 +12,15 @@ def main():
     train = any(arg == '--train' for arg in sys.argv) and not manual
     fps = 60 if not manual else 0
     load_model = \
-        next((arg for arg in sys.argv if arg.startswith('--model=')), None) \
+        next((arg for arg in sys.argv if arg.startswith('--model=')), None)\
         if not manual else None
     load_model = load_model.split('=')[1] \
         if load_model is not None else None
+    episodes = \
+        next((arg for arg in sys.argv if arg.startswith('--episodes=')), None)\
+        if train else None
+    episodes = int(episodes.split('=')[1]) \
+        if episodes is not None else None
 
     best_score = 0
     games = 0
@@ -40,6 +45,10 @@ def main():
         fps=fps,
         green_apples_count=config['green_apples_count'],
         red_apples_count=config['red_apples_count'],
+        alive_reward=config['alive_reward'],
+        death_reward=config['death_reward'],
+        green_apple_reward=config['green_apple_reward'],
+        red_apple_reward=config['red_apple_reward'],
     )
 
     while True:
@@ -127,6 +136,17 @@ def main():
                         config['models_path'] + "best_model"
                         + str(score) + ".pth"
                     )
+
+            if episodes is not None and games >= episodes:
+                if train:
+                    agent.model.save(
+                        config['models_path'] +
+                        "final_model"
+                        + str(episodes) + "_episodes"
+                        + "_best_score_" + str(best_score)
+                        + ".pth"
+                    )
+                break
 
 
 if __name__ == "__main__":

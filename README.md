@@ -17,3 +17,4 @@
 - [📺 YouTube − Python + PyTorch + Pygame Reinforcement Learning – Train an AI to Play Snake](https://www.youtube.com/watch?v=L8ypSXwyBds)
 - [📖 PyTorch − Reinforcement Learning (DQN) Tutorial](https://pytorch.org/tutorials/intermediate/reinforcement_q_learning.html)
 - [📖 HuggingFace − The Deep Q-Learning Algorithm](https://huggingface.co/learn/deep-rl-course/unit3/deep-q-algorithm)
+- [📖 arXiv − Accelerated Methods for Deep Reinforcement Learning](https://arxiv.org/pdf/1803.02811): information about batch sizes.

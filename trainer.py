@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from settings import config
+from model import DQN
 
 # torch.autograd.set_detect_anomaly(True)
 
@@ -21,7 +22,7 @@ from settings import config
 
 
 class Trainer:
-    def __init__(self, model, lr, gamma):
+    def __init__(self, model: DQN, lr, gamma):
         self.lr = lr
         self.gamma = gamma
         self.model = model
@@ -49,10 +50,11 @@ class Trainer:
         target = prediction.clone()
 
         for i in range(len(done)):
-            Q_new = reward[i]
-            if not done[i]:
-                Q_new = reward[i] + (self.gamma *
-                                     torch.max(self.model(next_state[i])))
+            with torch.no_grad():
+                Q_new = reward[i]
+                if not done[i]:
+                    Q_new = reward[i] + (self.gamma *
+                                         torch.max(self.model(next_state[i])))
 
             target[i][action[i].argmax().item()] = Q_new
 
