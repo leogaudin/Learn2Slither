@@ -8,8 +8,8 @@ config:
   lr: 0.01 # Keep it high enough to actually learn
   max_memory: 1000000
   batch_size: 1024
-  game_width: 800
-  game_height: 800
+  game_width: 200
+  game_height: 200
   block_size: 20
   alive_reward: -0.5
   death_reward: -100

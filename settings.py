@@ -18,7 +18,7 @@ def get_args(args: list[str]):
     step_by_step = any(arg == '--step' for arg in args)
     manual = any(arg == '--manual' for arg in args)
     train = any(arg == '--train' for arg in args) and not manual
-    fps = 60 if not manual else 0
+    fps = 30 if manual else 0
     load_model = \
         next((arg for arg in args if arg.startswith('--model=')), None)\
         if not manual else None
