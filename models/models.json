@@ -2,8 +2,8 @@
     {
         "filename": "final_1000.pth",
         "episodes": 1000,
-        "best_score": 21,
-        "mean_score": 2.675,
+        "training_best_score": 21,
+        "training_mean_score": 2.675,
         "network": [13, 42, 42, 3],
         "state": [
             "move_std_dev",
