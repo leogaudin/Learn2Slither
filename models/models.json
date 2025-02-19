@@ -4,6 +4,8 @@
         "episodes": 1000,
         "training_best_score": 21,
         "training_mean_score": 2.675,
+        "testing_best_score": 35,
+        "testing_mean_score": 14.039,
         "network": [13, 42, 42, 3],
         "state": [
             "move_std_dev",
