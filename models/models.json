@@ -1,8 +1,9 @@
 [
     {
-        "filename": "smol_500.pth",
-        "episodes": 500,
-        "best_score": 19,
+        "filename": "final_1000.pth",
+        "episodes": 1000,
+        "best_score": 21,
+        "mean_score": 2.675,
         "network": [13, 42, 42, 3],
         "state": [
             "move_std_dev",
@@ -32,15 +33,15 @@
             "lr": 0.01,
             "max_memory": 1000000,
             "batch_size": 1024,
-            "game_width": 200,
-            "game_height": 200,
-            "block_size": 20,
+            "game_width": 800,
+            "game_height": 800,
+            "block_size": 80,
             "green_apples_count": 2,
             "red_apples_count": 1,
             "alive_reward": -0.5,
             "death_reward": -100,
-            "green_apple_reward": 20,
-            "red_apple_reward": -20
+            "green_apple_reward": 5,
+            "red_apple_reward": -5
         }
     }
 ]

@@ -4,15 +4,18 @@ from enum import Enum
 from collections import namedtuple
 import numpy as np
 
-pygame.font.init()
+pygame.init()
 
 Point = namedtuple("Point", "x, y")
 
+BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
 GREEN = (0, 255, 0)
+FT_RED = (232, 33, 39)
 FT_BLUE = (0, 186, 188)
+FT_GREEN = (15, 218, 83)
 
 
 class Direction(Enum):
@@ -43,6 +46,9 @@ class SnakeGame:
         self.width = width
         self.height = height
         self.block_size = block_size
+        self.font_size = height // 30
+        self.font = pygame.font.Font('assets/cmunrm.ttf',
+                                     self.font_size)
         self.fps = fps
         self.green_apples_count = np.mean([width, height]) \
             // block_size // 10 * 2
@@ -127,7 +133,7 @@ class SnakeGame:
         self.score = len(self.snake) - 3
 
         game_over = False
-        reward = self.alive_reward / self._move_std_dev() \
+        reward = self.alive_reward / (self._move_std_dev() ** 3) \
             if len(self.move_history) > 2 \
             else self.alive_reward
 
@@ -169,35 +175,33 @@ class SnakeGame:
         return False
 
     def _update_ui(self, to_display=[]):
-        self.display.fill(WHITE)
+        self.display.fill(BLACK)
 
         for pt in self.snake:
             pygame.draw.rect(
-                self.display, FT_BLUE,
+                self.display, WHITE,
                 pygame.Rect(pt.x, pt.y, self.block_size, self.block_size)
             )
 
         for pt in self.green_apples:
-            pygame.draw.rect(
-                self.display, GREEN,
-                pygame.Rect(pt.x, pt.y, self.block_size, self.block_size)
+            pygame.draw.circle(
+                self.display, FT_GREEN,
+                (pt.x + self.block_size // 2, pt.y + self.block_size // 2),
+                self.block_size // 2
             )
 
         for pt in self.red_apples:
-            pygame.draw.rect(
+            pygame.draw.circle(
                 self.display, RED,
-                pygame.Rect(pt.x, pt.y, self.block_size, self.block_size)
+                (pt.x + self.block_size // 2, pt.y + self.block_size // 2),
+                self.block_size // 2
             )
 
-        text = "Score: " + str(self.score)
-        font = pygame.font.Font(None, 30)
-        score = font.render(text, True, FT_BLUE)
-        x = self.block_size
-        y = self.block_size
+        x, y = self.block_size // 2, self.block_size // 2
         for line in to_display:
-            score = font.render(line, True, FT_BLUE)
-            self.display.blit(score, (x, y))
-            y += self.block_size * 1.5
+            line = self.font.render(line, True, WHITE)
+            self.display.blit(line, (x, y))
+            y += self.font_size * 1.5
 
         pygame.display.flip()
 
