@@ -41,6 +41,8 @@ def main():
         fps=fps,
         alive_reward=config['alive_reward'],
         death_reward=config['death_reward'],
+        green_apple_reward=config['green_apple_reward'],
+        red_apple_reward=config['red_apple_reward'],
         invisible=invisible,
     )
 
@@ -68,11 +70,11 @@ def main():
         if not execute:
             continue
 
-        state_with_labels = game.get_state()
-        state = [element['value'] for element in state_with_labels]
+        prev_state_with_labels = game.get_state()
+        prev_state = [element['value'] for element in prev_state_with_labels]
 
         if not manual:
-            action = agent.get_action(state)
+            action = agent.get_action(prev_state)
             move = game.relative_to_absolute(action)
 
         (reward, done, score) = game.play_step(
@@ -94,12 +96,12 @@ def main():
                 f"Done: {done}",
             ]
 
-            for element in state_with_labels:
+            for element in prev_state_with_labels:
+                logs.append(f"Previous State {element['label']}: \
+                            {element['value']}")
+            for element in next_state_with_labels:
                 logs.append(f"State {element['label']}: \
                             {element['value']}")
-            # for element in next_state_with_labels:
-            #     logs.append(f"Next State {element['label']}: \
-            #                 {element['value']}")
 
             for log in logs:
                 print(log)
@@ -107,8 +109,10 @@ def main():
             print()
 
         if train:
-            agent.train_short_memory(state, action, reward, next_state, done)
-            agent.remember(state, action, reward, next_state, done)
+            agent.train_short_memory(prev_state, action,
+                                     reward, next_state, done)
+            agent.remember(prev_state, action,
+                           reward, next_state, done)
 
         if done:
             game.reset()

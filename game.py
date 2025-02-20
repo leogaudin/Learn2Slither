@@ -133,7 +133,7 @@ class SnakeGame:
         self.score = len(self.snake) - 3
 
         game_over = False
-        reward = self.alive_reward / (self._move_std_dev() ** 3) \
+        reward = self.alive_reward / (self._move_index() ** 3) \
             if len(self.move_history) > 2 \
             else self.alive_reward
 
@@ -275,9 +275,9 @@ class SnakeGame:
 
         return False
 
-    def _move_std_dev(self):
-        if len(self.move_history) < 2:
-            return 0
+    def _move_index(self):
+        if len(self.move_history) < 1:
+            return 1
 
         coordinates = [move['head'] for move in self.move_history[-10:]]
         x = np.array([point.x for point in coordinates])
@@ -291,10 +291,10 @@ class SnakeGame:
 
     def get_state(self):
         head = self.snake[0] if len(self.snake) > 0 else self.head
-        point_l = Point(head.x - 20, head.y)
-        point_r = Point(head.x + 20, head.y)
-        point_u = Point(head.x, head.y - 20)
-        point_d = Point(head.x, head.y + 20)
+        direct_left = Point(head.x - self.block_size, head.y)
+        direct_right = Point(head.x + self.block_size, head.y)
+        direct_up = Point(head.x, head.y - self.block_size)
+        direct_down = Point(head.x, head.y + self.block_size)
 
         dir_l = self.direction == Direction.LEFT
         dir_r = self.direction == Direction.RIGHT
@@ -317,8 +317,8 @@ class SnakeGame:
 
         state = [
             {
-                "label": "move_std_dev",
-                "value": self._move_std_dev(),
+                "label": "move_index",
+                "value": self._move_index(),
             },
             {
                 "label": "last_move_straight",
@@ -334,24 +334,24 @@ class SnakeGame:
             },
             {
                 "label": "danger_straight",
-                "value": (dir_r and self.is_collision(point_r))
-                or (dir_l and self.is_collision(point_l))
-                or (dir_u and self.is_collision(point_u))
-                or (dir_d and self.is_collision(point_d)),
+                "value": (dir_r and self.is_collision(direct_right))
+                or (dir_l and self.is_collision(direct_left))
+                or (dir_u and self.is_collision(direct_up))
+                or (dir_d and self.is_collision(direct_down)),
             },
             {
                 "label": "danger_left",
-                "value": (dir_d and self.is_collision(point_r))
-                or (dir_u and self.is_collision(point_l))
-                or (dir_r and self.is_collision(point_u))
-                or (dir_l and self.is_collision(point_d)),
+                "value": (dir_d and self.is_collision(direct_right))
+                or (dir_u and self.is_collision(direct_left))
+                or (dir_r and self.is_collision(direct_up))
+                or (dir_l and self.is_collision(direct_down)),
             },
             {
                 "label": "danger_right",
-                "value": (dir_u and self.is_collision(point_r))
-                or (dir_d and self.is_collision(point_l))
-                or (dir_l and self.is_collision(point_u))
-                or (dir_r and self.is_collision(point_d)),
+                "value": (dir_u and self.is_collision(direct_right))
+                or (dir_d and self.is_collision(direct_left))
+                or (dir_l and self.is_collision(direct_up))
+                or (dir_r and self.is_collision(direct_down)),
             },
             {"label": "green_apple_straight",
              "value": self._is_there_point(head, self.green_apples, straight)},
