@@ -131,11 +131,11 @@ def main():
 
             if score > best_score:
                 best_score = score
-                if train:
-                    agent.model.save(
-                        config['models_path'] + "best_model"
-                        + str(score) + ".pth"
-                    )
+                # if train:
+                #     agent.model.save(
+                #         config['models_path'] + "best_model"
+                #         + str(score) + ".pth"
+                #     )
 
             if episodes is not None and games >= episodes:
                 if train:
