@@ -3,9 +3,9 @@
         "filename": "final_1000.pth",
         "episodes": 1000,
         "training_best_score": 21,
-        "training_mean_score": 2.675,
-        "testing_best_score": 35,
-        "testing_mean_score": 14.039,
+        "training_mean_score": 3.524,
+        "testing_best_score": 42,
+        "testing_mean_score": 20.759,
         "network": [13, 42, 42, 3],
         "state": [
             "move_std_dev",
@@ -38,12 +38,10 @@
             "game_width": 800,
             "game_height": 800,
             "block_size": 80,
-            "green_apples_count": 2,
-            "red_apples_count": 1,
-            "alive_reward": -0.5,
+            "alive_reward": -1,
             "death_reward": -100,
-            "green_apple_reward": 5,
-            "red_apple_reward": -5
+            "green_apple_reward": 20,
+            "red_apple_reward": -20
         }
     }
 ]
