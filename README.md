@@ -393,57 +393,7 @@ This will make less attractive for the snake to repeat the same patterns.
 
 ## About this repository
 
-The models available in this repository were trained using the following hyperparameters in this table:
-
-<!-- [
-    {
-        "filename": "final_1000.pth",
-        "episodes": 1000,
-        "training_best_score": 17,
-        "training_mean_score": 3.139,
-        "testing_best_score": 43,
-        "testing_mean_score": 21.903,
-        "network": [13, 42, 42, 3],
-        "state": [
-            "move_index",
-            "last_move_straight",
-            "last_move_left",
-            "last_move_right",
-            "danger_straight",
-            "danger_left",
-            "danger_right",
-            "green_apple_straight",
-            "green_apple_left",
-            "green_apple_right",
-            "red_apple_straight",
-            "red_apple_left",
-            "red_apple_right"
-        ],
-        "output": [
-            "go_straight",
-            "go_left",
-            "go_right"
-        ],
-        "config": {
-            "gamma": 0.95,
-            "epsilon_init": 0.9,
-            "epsilon_min": 0.2,
-            "epsilon_decay": 0.995,
-            "lr": 0.01,
-            "max_memory": 1000000,
-            "batch_size": 1024,
-            "game_width": 800,
-            "game_height": 800,
-            "block_size": 80,
-            "alive_reward": -2.5,
-            "death_reward": -100,
-            "green_apple_reward": 25,
-            "red_apple_reward": -25
-        }
-    }
-] -->
-
-<p align='center'>
+The models available in this repository were trained using the following hyperparameters:
 
 | Hyperparameter | final_1000.pth |
 | --- | --- |
@@ -461,8 +411,6 @@ The models available in this repository were trained using the following hyperpa
 | `death_reward` | -100 |
 | `green_apple_reward` | 25 |
 | `red_apple_reward` | -25 |
-
-</p>
 
 
 ## Resources
