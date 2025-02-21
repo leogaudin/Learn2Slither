@@ -26,6 +26,8 @@
     - [Rewards](#rewards) 🎁
         - [Tip if your snake starts to go in circles](#tip-if-your-snake-starts-to-go-in-circles) 🔄
 
+- [About this repository](#about-this-repository) 📚
+
 - [Resources](#resources) 📖
 
 ## Introduction
