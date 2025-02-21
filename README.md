@@ -397,12 +397,6 @@ This will make less attractive for the snake to repeat the same patterns.
 
 The models available in this repository were trained using the following hyperparameters:
 
-<!-- "training_best_score": 17,
-        "training_mean_score": 3.139,
-        "testing_best_score": 43,
-        "testing_mean_score": 21.903,
-        "network": [13, 42, 42, 3], -->
-
 | Value | final_1000.pth |
 | --- | --- |
 | `game_width` | 800 |
@@ -424,8 +418,6 @@ The models available in this repository were trained using the following hyperpa
 | `death_reward` | -100 |
 | `green_apple_reward` | 25 |
 | `red_apple_reward` | -25 |
-
-
 
 ## Resources
 
