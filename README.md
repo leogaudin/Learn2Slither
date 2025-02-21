@@ -397,8 +397,22 @@ This will make less attractive for the snake to repeat the same patterns.
 
 The models available in this repository were trained using the following hyperparameters:
 
-| Hyperparameter | final_1000.pth |
+<!-- "training_best_score": 17,
+        "training_mean_score": 3.139,
+        "testing_best_score": 43,
+        "testing_mean_score": 21.903,
+        "network": [13, 42, 42, 3], -->
+
+| Value | final_1000.pth |
 | --- | --- |
+| `game_width` | 800 |
+| `game_height` | 800 |
+| `block_size` | 80 |
+| `training_best_score` | 17 |
+| `training_mean_score` | 3.139 |
+| `testing_best_score` | 43 |
+| `testing_mean_score` | 21.903 |
+| `network` | 13-42-42-3 |
 | `gamma` | 0.95 |
 | `epsilon_init` | 0.9 |
 | `epsilon_min` | 0.2 |
@@ -406,13 +420,11 @@ The models available in this repository were trained using the following hyperpa
 | `lr` | 0.01 |
 | `max_memory` | 1000000 |
 | `batch_size` | 1024 |
-| `game_width` | 800 |
-| `game_height` | 800 |
-| `block_size` | 80 |
 | `alive_reward` | -2.5 |
 | `death_reward` | -100 |
 | `green_apple_reward` | 25 |
 | `red_apple_reward` | -25 |
+
 
 
 ## Resources
