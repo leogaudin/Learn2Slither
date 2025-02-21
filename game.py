@@ -275,7 +275,7 @@ class SnakeGame:
     def _move_index(self):
         """ Return how much the snake is currently moving
         """
-        if len(self.move_history) < 1:
+        if len(self.move_history) < 2:
             return 1
 
         coordinates = [move['head'] for move in self.move_history[-10:]]

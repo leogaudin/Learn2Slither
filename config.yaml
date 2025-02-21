@@ -11,7 +11,7 @@ config:
   game_width: 800
   game_height: 800
   block_size: 80
-  alive_reward: -1
+  alive_reward: -2.5
   death_reward: -100
-  green_apple_reward: 20
-  red_apple_reward: -20
+  green_apple_reward: 25
+  red_apple_reward: -25
