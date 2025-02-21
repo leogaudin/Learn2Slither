@@ -38,6 +38,8 @@ class SnakeGame:
         death_reward=-100,
         invisible=False,
     ):
+        """ Initialize the game
+        """
         if width % (block_size * 2) != 0 or height % (block_size * 2) != 0:
             raise Exception(
                 "Width and Height must be multiples of " + str(block_size * 2)
@@ -65,8 +67,9 @@ class SnakeGame:
         self.reset()
 
     def reset(self):
+        """ Reset the game
+        """
         self.move_history = []
-        self.time_alive = 0
         self.direction = random.choice(list(Direction))
         self.head = Point(
             random.randint(0, (self.width - self.block_size)
@@ -85,6 +88,8 @@ class SnakeGame:
         self._place_food()
 
     def _place_food(self):
+        """ Regenerate the green and red apples
+        """
         while len(self.green_apples) < self.green_apples_count:
             x = random.randint(0, (self.width - self.block_size)
                                // self.block_size) * self.block_size
@@ -120,7 +125,8 @@ class SnakeGame:
         direction=None,
         to_display: list[str] = []
     ):
-        self.time_alive += 1
+        """ Play a step in the game given a direction
+        """
         self.direction = self._move(
             direction if direction is not None else self.direction
         )
@@ -162,6 +168,9 @@ class SnakeGame:
         return reward, game_over, self.score
 
     def is_collision(self, point):
+        """ Check if the snake collides with the wall or itself
+            in the given point
+        """
         if (
             point.x > self.width - self.block_size
             or point.x < 0
@@ -175,6 +184,8 @@ class SnakeGame:
         return False
 
     def _update_ui(self, to_display=[]):
+        """ Update the game UI
+        """
         self.display.fill(BLACK)
 
         for pt in self.snake:
@@ -206,6 +217,8 @@ class SnakeGame:
         pygame.display.flip()
 
     def _move(self, direction):
+        """ Move the snake in the given direction
+        """
         x = self.head.x
         y = self.head.y
         if direction == Direction.RIGHT:
@@ -221,31 +234,11 @@ class SnakeGame:
 
         return direction
 
-    def _distance(self, point1, point2):
-        if not (point1.x == point2.x or point1.y == point2.y):
-            return -1
-
-        distance = ((point1.x - point2.x) ** 2
-                    + (point1.y - point2.y) ** 2) ** 0.5
-
-        return distance
-
-    def _direction(self, point1, point2):
-        direction = None
-        if point1.x == point2.x:
-            if point1.y < point2.y:
-                direction = Direction.DOWN
-            else:
-                direction = Direction.UP
-        elif point1.y == point2.y:
-            if point1.x < point2.x:
-                direction = Direction.RIGHT
-            else:
-                direction = Direction.LEFT
-
-        return direction
-
     def relative_to_absolute(self, direction):
+        """ Given a relative direction (left, right, straight),
+            return the absolute cardinal direction (up, down,
+            left, right)
+        """
         clock = [Direction.RIGHT, Direction.DOWN, Direction.LEFT, Direction.UP]
         i = clock.index(self.direction)
         choices = [
@@ -256,6 +249,10 @@ class SnakeGame:
         return clock[choices[np.argmax(direction)]]
 
     def _is_there_point(self, from_point, to_points, direction):
+        """ Given a starting point, a list of points and a direction,
+            return True if there is a point directly in the given direction
+            from the starting point
+        """
         if direction == Direction.RIGHT:
             return any([from_point.x < to_point.x
                         and from_point.y == to_point.y
@@ -276,6 +273,8 @@ class SnakeGame:
         return False
 
     def _move_index(self):
+        """ Return how much the snake is currently moving
+        """
         if len(self.move_history) < 1:
             return 1
 
@@ -290,6 +289,8 @@ class SnakeGame:
         return std_dev
 
     def get_state(self):
+        """ Return the current state of the game
+        """
         head = self.snake[0] if len(self.snake) > 0 else self.head
         direct_left = Point(head.x - self.block_size, head.y)
         direct_right = Point(head.x + self.block_size, head.y)

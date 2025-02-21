@@ -4,6 +4,8 @@ plt.ion()
 
 
 def plot(scores, mean_scores):
+    """ Plot the scores and mean scores
+    """
     plt.clf()
     plt.xlabel('Number of Games')
     plt.ylabel('Score')
