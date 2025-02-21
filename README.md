@@ -213,7 +213,7 @@ state, action, reward, next_state, done = game.play_step(action)
 replay_memory.append((state, action, reward, next_state, done))
 ```
 
-This memory can be represented as a matrix of shape $(\text{n\_transitions}, 5)$, where each row is a transition.
+This memory can be represented as a matrix of shape $(\text{nTransitions}, 5)$, where each row is a transition.
 
 That will allow you to use the same function to train your model, whether it is on one transition or on a batch of transitions.
 
@@ -382,7 +382,7 @@ If the standard deviation is high, it means it is exploring.
 Let's take our base reward $-2.5$, and make it proportional to the standard deviation.
 
 $$
-\text{eat\_nothing\_reward} =  \frac{-2.5}{\text{std}^3}
+\text{eatNothingReward} =  \frac{-2.5}{\text{std}^3}
 $$
 
 Where $\text{std}$ is the mean of the standard deviation of the $x$ and $y$ positions of the snake.
