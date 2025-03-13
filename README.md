@@ -1,4 +1,7 @@
-<h1 align='center'> 🐍 Learn2Slither</h1>
+<div align='center'>
+	<h1>🐍 Learn2Slither</h1>
+	<img src="https://img.shields.io/badge/-122%2F100-success?logo=42&logoColor=fff" />
+</div>
 
 > ⚠️ This tutorial assumes you have done [multilayer-perceptron](https://github.com/leogaudin/multilayer-perceptron) and [dslr](https://github.com/leogaudin/dslr).
 
